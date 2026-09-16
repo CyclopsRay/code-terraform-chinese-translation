@@ -1,6 +1,6 @@
 # Code: Terraform 中文译本
 
-本仓库包含《Code: Terraform》玩家文档的中文译本。
+本仓库包含《Code: Terraform》玩家文档的中文译本。如果有翻译问题请提交Issue！好用的话欢迎打星谢谢喵。
 
 ## 内容
 
