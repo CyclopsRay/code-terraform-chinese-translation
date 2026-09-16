@@ -207,7 +207,8 @@ def main() -> None:
         canvas.saveState()
         canvas.setFont("STSong-Light", 7)
         canvas.setFillColor(colors.HexColor("#667085"))
-        canvas.drawCentredString(A4[0] / 2, 10 * mm, "Made by: CyclopsRay")
+        canvas.drawString(16 * mm, 10 * mm, f"Code: Terraform 中文译本  |  输出页 {doc.page}")
+        canvas.drawRightString(A4[0] - 16 * mm, 10 * mm, "Made by: CyclopsRay")
         canvas.restoreState()
 
     story = [Paragraph("《Code: Terraform》中文译本", ParagraphStyle(name="title", fontName="STSong-Light", fontSize=24, leading=32, alignment=TA_CENTER, spaceAfter=12 * mm)), Paragraph("术语采用中文（English）形式；代码、API、命令与标识符均保持原样。源文档中的嵌入图示已随页附入。", styles["body"]), PageBreak()]
