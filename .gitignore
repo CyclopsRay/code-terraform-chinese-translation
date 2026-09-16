@@ -1,0 +1,9 @@
+# Source material and generated working data
+Code_ Terraform.pdf
+tmp/
+output/translation/
+
+# Local environment files
+.DS_Store
+__pycache__/
+*.py[cod]
