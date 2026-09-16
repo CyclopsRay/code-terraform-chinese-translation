@@ -4,7 +4,7 @@ import html
 import re
 from pathlib import Path
 
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import A4
@@ -32,6 +32,26 @@ OUT_DIR = ROOT / "output" / "pdf"
 IMAGE_DIR = ROOT / "tmp" / "pdfs" / "translated-images"
 OUT_PDF = OUT_DIR / "Code_Terraform_中文译本.pdf"
 OUT_MD = OUT_DIR / "Code_Terraform_中文译本.md"
+
+BOOKMARKS = [
+    ("封面与说明", 1),
+    ("目录", 2),
+    ("指南：开始", 13),
+    ("教程", 19),
+    ("编程", 31),
+    ("编辑器与工具", 65),
+    ("自动化系统", 82),
+    ("生产与物流", 101),
+    ("世界与基础设施", 110),
+    ("参考", 144),
+    ("命令", 147),
+    ("内置函数", 151),
+    ("内置模块", 187),
+    ("语言", 198),
+    ("组件参考", 219),
+    ("组件与电力", 253),
+    ("类型与面板", 1056),
+]
 
 SEGMENTS = [
     (1, 20, "segment-early-01-pages-0001-0020.md"),
@@ -87,6 +107,24 @@ def extract_page_images() -> dict[int, list[Path]]:
         if paths:
             images[page_no] = paths
     return images
+
+
+def add_bookmarks() -> None:
+    reader = PdfReader(OUT_PDF)
+    writer = PdfWriter()
+    for page in reader.pages:
+        writer.add_page(page)
+    text_by_page = [page.extract_text() or "" for page in reader.pages]
+    for title, source_page in BOOKMARKS:
+        marker = f"源 PDF 第 {source_page} 页"
+        output_page = next((index for index, text in enumerate(text_by_page) if marker in text), None)
+        if output_page is None:
+            raise ValueError(f"cannot find output page for bookmark {marker}")
+        writer.add_outline_item(title, output_page)
+    temporary = OUT_PDF.with_suffix(".bookmarks.pdf")
+    with temporary.open("wb") as stream:
+        writer.write(stream)
+    temporary.replace(OUT_PDF)
 
 
 def to_flowables(text: str, styles: dict[str, ParagraphStyle]):
@@ -188,6 +226,7 @@ def main() -> None:
             story.append(PageBreak())
     doc = SimpleDocTemplate(str(OUT_PDF), pagesize=A4, leftMargin=16 * mm, rightMargin=16 * mm, topMargin=15 * mm, bottomMargin=16 * mm, title="Code: Terraform 中文译本", author="Codex")
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
+    add_bookmarks()
     print(f"built {OUT_PDF}")
     print(f"translated_pages={len(pages)} image_pages={len(page_images)} images={sum(map(len, page_images.values()))}")
 
